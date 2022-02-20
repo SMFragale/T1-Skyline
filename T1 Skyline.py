@@ -1,16 +1,5 @@
 import lector
 
-input = [[1,3,4], [2,4,2], [5,8,2], [6,7,1]]
-
-input2: list = []
-for r in input:
-    input2.append((r[0], r[2]))
-    input2.append((r[1], r[2]))
-    input2.append((r[1], 0))
-
-input2.sort(key = lambda x: (x[0], -x[1]))
-print(input2)
-
 class Point:
     def __init__(self, x, y) -> None:
         self.x: int = x
