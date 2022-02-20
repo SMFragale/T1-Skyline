@@ -1,3 +1,5 @@
+import lector
+
 input = [[1,3,4], [2,4,2], [5,8,2], [6,7,1]]
 
 input2: list = []
@@ -27,10 +29,32 @@ class Point:
             return other
         else:
             return self if self.y > other.y else other
-        
 
-#Precondiciones: Las figuras están ordenadas del más pequeño en x al más grande y si son iguales, del más pequeño en y al más grande
-def combinar(i_figura: list[Point], j_figura: list[Point]):
+def overlap():
+    figuras = lector.leer_figuras()
+    print(figuras)
+    puntos = list(map(lambda e:[Point(e[0], e[2]), Point(e[1], 0)], figuras))
+    print(puntos)
+    contorno(puntos)
+
+def contorno(puntos: list[list[Point]]):
+    if len(puntos) <= 1:
+        return
+
+    mitad = len(puntos) // 2
+    iz = puntos[:mitad]
+    der = puntos[mitad:]
+    
+    iz = contorno(iz)
+    der = contorno(der)
+
+    combinado = combinar_puntos(iz, der)
+    return combinado
+
+overlap()
+
+#Combina dos figuras (grupos de puntos)
+def combinar_puntos(i_figura: list[Point], j_figura: list[Point]):
     retorno: list[Point] = []
     i: int = 0
     j: int = 0
@@ -43,52 +67,22 @@ def combinar(i_figura: list[Point], j_figura: list[Point]):
     else:
         j += 1
         retorno.append(j_figura[0])
-
-    #Acaba cuando alguna de las dos figuras termina de analizarse
+    
     while i < len(i_figura) and j < len(j_figura):
-        i_punto = i_figura[i]
-        j_punto = j_figura[j]
-        if i_punto.y == 0:
-            if i_punto.en_rango(j_figura):
-                i += 1
-            else:
-                i += 1
-                retorno.append(i_punto)
+        if i_figura[i].x < j_figura[j].x:
+            x = i_figura[i].x
+            y = max(i_figura[i].y, j_figura[j].y)
+            retorno.append(Point(x, y))
+            i += 1
         else:
-            anterior = retorno[-1]
-            siguiente = i_figura[i+1].compare_get(j_figura[j+1])
-            if i_punto.y > anterior.y and i_punto.y < siguiente.y:
-                #intersection
-                pass
-            else:
-                #no hay intersection
-                nuevo_punto = i_punto.compare_get(j_punto)
-                if nuevo_punto == i_punto:
-                    #Si está en la misma altura que el punto anterior, se descarta y se toma el otro
-                    if anterior.y == nuevo_punto.y:
-                        retorno.append(j_punto)
-                        j += 1
-                        i += 1
-                    else:
-                        retorno.append(i_punto)
-                        i += 1
-                else:
-                    #Si está en la misma altura que el punto anterior, se descarta y se toma el otro
-                    if anterior.y == nuevo_punto.y:
-                        retorno.append(i_punto)
-                        i += 1
-                        j += 1
-                    else:
-                        retorno.append(j_punto)
-                        j += 1
-            
-    #Cuando alguna de las dos figuras termina de analizarse, la que queda restante puede terminar de poner el resto de sus puntos pues no hay más comparaciones necesarias
+            x = j_figura[j].x
+            y = max(i_figura[i].y, j_figura[j].y)
+            retorno.append(Point(x, y))
+            j += 1
+    
     if i >= len(i_figura):
         retorno += j_figura[j:]
     elif j >= len(j_figura):
         retorno += i_figura[i:]
-
-                
-        
 
             
